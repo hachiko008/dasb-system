@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class dasb extends javax.swing.JFrame {
-    String fetch = "select id from driver where driver_status_id = 1 order by name limit 1";
+    String fetch = "select id from driver where driver_status_id = 1 order by time_in,ref_date asc limit 1";
     public dasb() {
         initComponents();
         CurrentTimeStamp();
@@ -22,14 +22,14 @@ public class dasb extends javax.swing.JFrame {
             Statement stmt=con.createStatement();
             
             //count available drivers
-            String cunt = "select count(id) from driver where driver_status_id = 1";
-            ResultSet rs = stmt.executeQuery(cunt);
+            String count = "select count(id) from driver where driver_status_id = 1";
+            ResultSet rs = stmt.executeQuery(count);
             while(rs.next()){
-            cunt = rs.getString(1);
-            lblcount.setText(cunt);
+            count = rs.getString(1);
+            lblcount.setText(count);
         }
             //load passengers list
-            String load="select passenger_name,time_in,quantity,origin,destination,B.name,C.description from travel_history A "
+            String load="select passenger_name,A.time_in,quantity,origin,destination,B.name,C.description from travel_history A "
                     + "inner join driver B on A.driver_id = B.id "
                     + "inner join driver_status C on B.driver_status_id = C.id";
             ResultSet rs2 = stmt.executeQuery(load);
@@ -46,13 +46,13 @@ public class dasb extends javax.swing.JFrame {
             model.addRow(new Object []{
             name,time,quantity,location,destination,drvname,drvstat});
         }
-        //Generate driver id then passing for update
+        //Generate driver id then passing it for update
         ResultSet rs3 = stmt.executeQuery(fetch);
         while (rs3.next()){
          fetch = rs3.getString(1);
          System.out.println("Driver id: "+fetch);
         }
-        //load cities from combobox
+        //populate combobox for town
            String town = "select description from town order by description";
            ResultSet rs4 = stmt.executeQuery(town);
            while(rs4.next()){
@@ -285,7 +285,7 @@ public class dasb extends javax.swing.JFrame {
                     String destination = txt5.getSelectedItem().toString();
                     
                     //fetch generated driver id then update
-                    String update="UPDATE driver SET driver_status_id = 4 WHERE id = "+(fetch)+"";
+                    String update="UPDATE driver SET driver_status_id = 2 WHERE id = "+(fetch)+"";
                     System.out.println("Updating: "+update);
                     PreparedStatement prep = con.prepareStatement(update);
                     prep.executeUpdate(update);
@@ -296,20 +296,6 @@ public class dasb extends javax.swing.JFrame {
                     System.out.println("Executing: "+sql);
                     stmt.executeUpdate(sql);
                     
-                    //book logs (hindi pa considered as book logs kase hindi pa filtered ung booking na tapos na)
-                    /*SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");  
-                    String date2 = format2.format(date);
-                    String pid = "select id from travel_history order by id desc limit 1";
-                    System.out.println("Ref Date: "+date2);
-                    ResultSet rs4 = stmt.executeQuery(pid);
-                    while (rs4.next()){
-                     pid = rs4.getString(1);
-                     System.out.println("Passenger id: "+pid);
-                    }
-                    String history="insert into travel_history (driver_id,driver_name,passenger_id,passenger_name,time_in,ref_date) "
-                        + "values("+(fetch)+",(select name from driver where id = "+(fetch)+"),'"+(pid)+"','"+(name)+"','"+(time)+"','"+(date2)+"')";
-                    System.out.println("Executing: "+history);
-                    stmt.executeUpdate(history); **/
                     JOptionPane.showMessageDialog(null, "Saved!","SAVE",JOptionPane.INFORMATION_MESSAGE);
                     this.dispose();
                     new dasb().setVisible(true);

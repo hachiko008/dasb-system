@@ -10,32 +10,41 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class driver extends javax.swing.JFrame {
-
     public driver() {
         initComponents();
         CurrentTimeStamp();
         this.setLocationRelativeTo(null);
         DefaultTableModel model=(DefaultTableModel) table.getModel();
             try{
-                        Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
             com.mysql.jdbc.Connection con= (com.mysql.jdbc.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","");
             Statement stmt=con.createStatement();
 
             //load drivers list
             String load="select A.name,B.description,A.time_in,A.ref_date from driver A "
-                        + "inner join driver_status B on A.driver_status_id = B.id order by A.time_in,A.ref_date asc";
+            + "inner join driver_status B on A.driver_status_id = B.id "
+            + "where B.id in (1,3) order by A.time_in";
             ResultSet rs = stmt.executeQuery(load);
             
-        while (rs.next())
-        {  
+            while (rs.next())
+            {  
             String name = rs.getString("A.name");
             String ttime = rs.getString("A.time_in");
-            String ddate = rs.getString("A.ref_date");
+            //String ddate = rs.getString("A.ref_date");
             String status = rs.getString("B.description");
             model.addRow(new Object []{
-            name,ttime,ddate,status});            
-        }
-            }catch(Exception e){
+            name,ttime,status});            
+            }
+            //getting driver status for update
+            String status = "select description from driver_status where id in (1,3)";
+            ResultSet rs2 = stmt.executeQuery(status);
+
+            while(rs2.next()){
+            status = rs2.getString(1);
+            String desc = rs2.getString("description");
+            stat.addItem(desc);
+            }
+        }catch(Exception e){
                 System.out.println(e);
             }
     }
@@ -55,7 +64,7 @@ public class driver extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        stat = new javax.swing.JComboBox<>();
         jButton3 = new javax.swing.JButton();
         txt1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -101,11 +110,11 @@ public class driver extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Time", "Date", "Status"
+                "Name", "Time", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -122,12 +131,16 @@ public class driver extends javax.swing.JFrame {
             table.getColumnModel().getColumn(0).setResizable(false);
             table.getColumnModel().getColumn(1).setResizable(false);
             table.getColumnModel().getColumn(2).setResizable(false);
-            table.getColumnModel().getColumn(3).setResizable(false);
         }
 
         jLabel3.setText("Status:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {}));
+        stat.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {}));
+        stat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Update");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -166,7 +179,7 @@ public class driver extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(stat, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(txt1, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -201,7 +214,7 @@ public class driver extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(stat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 19, Short.MAX_VALUE)))
@@ -242,35 +255,62 @@ public class driver extends javax.swing.JFrame {
                 SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
                 String date2 = format2.format(date);
                 System.out.println("date: "+date2);
-            int a = JOptionPane.showConfirmDialog(null, "Save this record?", "Message",  JOptionPane.YES_NO_OPTION);
-            if(a==0){         
-                String sql = "insert into driver (name,driver_status_id,time_in,ref_date) values ('"+drvrname+"',1,'"+time+"','"+date2+"');";   
-                System.out.println("Executing: "+sql); 
-                stmt.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Saved!","SAVE",JOptionPane.INFORMATION_MESSAGE);
                 
                 String load="select A.name,B.description,A.time_in,A.ref_date from driver A "
                         + "inner join driver_status B on A.driver_status_id = B.id order by A.time_in,A.ref_date asc";
-            ResultSet rs = stmt.executeQuery(load);
+                ResultSet rs = stmt.executeQuery(load);
                 while(rs.next()){
                     String name = rs.getString("A.name");
                     String ttime = rs.getString("A.time_in");
                     String ddate = rs.getString("A.ref_date");
                     String status = rs.getString("B.description");
                 model.addRow(new Object []{
-            name,time,ttime,ddate,status});
-                }
-            JOptionPane.showMessageDialog(null, "Saved","MESSAGE",JOptionPane.INFORMATION_MESSAGE);
-            txt2.setText("");
+                name,time,ttime,ddate,status});}
+                
+            int a = JOptionPane.showConfirmDialog(null, "Save this record?", "Message",  JOptionPane.YES_NO_OPTION);
+            if(a==0){
+                //add driver to the most recent time
+                String sql = "insert into driver (name,driver_status_id,time_in,ref_date) values ('"+drvrname+"',1,'"+time+"','"+date2+"');";   
+                System.out.println("Executing: "+sql); 
+                stmt.executeUpdate(sql);
+                JOptionPane.showMessageDialog(null, "Saved!","SAVE",JOptionPane.INFORMATION_MESSAGE);
+                
+                JOptionPane.showMessageDialog(null, "Saved","MESSAGE",JOptionPane.INFORMATION_MESSAGE);
+                txt2.setText("");
             }
         } catch (Exception e){
-        JOptionPane.showMessageDialog(null, "There seems to be the problem","ERROR",JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, "There seems to be the problem in adding a driver","ERROR",JOptionPane.ERROR_MESSAGE);
         System.out.println(e);
         }  
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+         try{
+             Class.forName("com.mysql.jdbc.Driver");
+             com.mysql.jdbc.Connection con= (com.mysql.jdbc.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","");
+             Statement stmt=con.createStatement();
+                        
+             int a = JOptionPane.showConfirmDialog(null, "Update this driver?", "Message",  JOptionPane.YES_NO_OPTION);
+             if (a==0){
+                Date date = new Date();
+                SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss a");  
+                String time = format.format(date);
+                String drvid = "select id from driver_status where description = '"+stat.getSelectedItem().toString()+"'";
+                ResultSet rs3 = stmt.executeQuery(drvid);
+
+                while(rs3.next()){
+                drvid = rs3.getString(1);
+                }
+                String update = "update driver set driver_status_id = "+drvid+", time_in = '"+time+"' where name  = '"+txt1.getText()+"' ";
+                PreparedStatement prep = con.prepareStatement(update);
+                prep.executeUpdate(update);
+                System.out.println("Query: "+update);
+                JOptionPane.showMessageDialog(null, "Update Sucessful!","SAVE",JOptionPane.INFORMATION_MESSAGE); 
+             }
+         }catch(Exception e){
+             JOptionPane.showMessageDialog(null, "There seems to be the problem in updating driver","ERROR",JOptionPane.ERROR_MESSAGE);
+             System.out.println(e);
+         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void txt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt1ActionPerformed
@@ -282,6 +322,10 @@ public class driver extends javax.swing.JFrame {
         int x = table.getSelectedRow();
         txt1.setText(model.getValueAt(x,0).toString());
     }//GEN-LAST:event_tableMouseClicked
+
+    private void statActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_statActionPerformed
 
     public static void main(String args[]) {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -316,7 +360,6 @@ public class driver extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -326,6 +369,7 @@ public class driver extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblTime;
+    private javax.swing.JComboBox<String> stat;
     private javax.swing.JTable table;
     private javax.swing.JTextField txt1;
     private javax.swing.JTextField txt2;

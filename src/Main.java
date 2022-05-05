@@ -22,7 +22,7 @@ public class Main extends javax.swing.JFrame {
         //ResultSet rs = stmt.executeQuery(user);
         
             //refresh book logs
-            String load="select driver_name,passenger_name,A.time_in,A.ref_date from travel_history A "
+            String load="select driver_name,passenger_name,A.time_in,A.ref_date,C.description from travel_history A "
                     + "inner join driver B on A.driver_id = B.id "
                     + "inner join driver_status C on B.driver_status_id = C.id "
                     + "where C.id in (2,3) order by A.time_in";
