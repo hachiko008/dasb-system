@@ -168,7 +168,6 @@ public class login extends javax.swing.JFrame {
             }else{
                 JOptionPane.showMessageDialog(null, "Incorrect Username or Password", "Error", JOptionPane.ERROR_MESSAGE);
                 userTxt.setText("");
-                passTxt.setText("");
             }
                    
             

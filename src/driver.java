@@ -274,9 +274,9 @@ public class driver extends javax.swing.JFrame {
                 System.out.println("Executing: "+sql); 
                 stmt.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "Saved!","SAVE",JOptionPane.INFORMATION_MESSAGE);
-                
-                JOptionPane.showMessageDialog(null, "Saved","MESSAGE",JOptionPane.INFORMATION_MESSAGE);
                 txt2.setText("");
+            this.dispose();
+            new driver().setVisible(true);   
             }
         } catch (Exception e){
         JOptionPane.showMessageDialog(null, "There seems to be the problem in adding a driver","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -306,6 +306,9 @@ public class driver extends javax.swing.JFrame {
                 prep.executeUpdate(update);
                 System.out.println("Query: "+update);
                 JOptionPane.showMessageDialog(null, "Update Sucessful!","SAVE",JOptionPane.INFORMATION_MESSAGE); 
+                this.dispose();
+                new driver().setVisible(true);
+                
              }
          }catch(Exception e){
              JOptionPane.showMessageDialog(null, "There seems to be the problem in updating driver","ERROR",JOptionPane.ERROR_MESSAGE);

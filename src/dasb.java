@@ -31,7 +31,7 @@ public class dasb extends javax.swing.JFrame {
             //load passengers list
             String load="select passenger_name,A.time_in,quantity,origin,destination,B.name,C.description from travel_history A "
                     + "inner join driver B on A.driver_id = B.id "
-                    + "inner join driver_status C on B.driver_status_id = C.id";
+                    + "inner join driver_status C on B.driver_status_id = C.id where B.driver_status_id in (1,2)";
             ResultSet rs2 = stmt.executeQuery(load);
         while (rs2.next())
         {  
