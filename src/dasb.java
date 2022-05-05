@@ -29,15 +29,14 @@ public class dasb extends javax.swing.JFrame {
             lblcount.setText(cunt);
         }
             //load passengers list
-            String load="select A.name,A.time,A.quantity,A.origin,A.destination, "
-            + "B.name,C.description from passenger A "
-            + "inner join driver B on A.driver_id = B.id "
-            + "inner join driver_status C on C.id = B.driver_status_id";
+            String load="select passenger_name,time_in,quantity,origin,destination,B.name,C.description from travel_history A "
+                    + "inner join driver B on A.driver_id = B.id "
+                    + "inner join driver_status C on B.driver_status_id = C.id";
             ResultSet rs2 = stmt.executeQuery(load);
         while (rs2.next())
         {  
-            String name = rs2.getString("name");
-            String time = rs2.getString("time");
+            String name = rs2.getString("passenger_name");
+            String time = rs2.getString("A.time_in");
             String quantity = rs2.getString("quantity");
             String location = rs2.getString("origin");
             String destination = rs2.getString("destination");
@@ -279,6 +278,8 @@ public class dasb extends javax.swing.JFrame {
                     SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss a");  
                     String time = format.format(date);
                     System.out.println("time is: "+time);
+                    SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");  
+                    String date2 = format2.format(date);
                     int quantity = Integer.parseInt(txt2.getText());
                     String origin = txt4.getSelectedItem().toString();
                     String destination = txt5.getSelectedItem().toString();
@@ -290,14 +291,15 @@ public class dasb extends javax.swing.JFrame {
                     prep.executeUpdate(update);
                     
                     //book passengers
-                    String sql="insert into passenger (name,time,quantity,origin,destination,driver_id) values ('"+(name)+"','"+(time)+"',"+(quantity)+",'"+(origin)+"','"+(destination)+"',"+(fetch)+")";
+                    String sql="insert into travel_history (destination,driver_id,driver_name,origin,passenger_name,time_in,ref_date,quantity) values "
+                    + "('"+(destination)+"',"+(fetch)+",(select name from driver where id = "+(fetch)+"),'"+(origin)+"','"+(name)+"','"+(time)+"','"+(date2)+"',"+(quantity)+")";
                     System.out.println("Executing: "+sql);
                     stmt.executeUpdate(sql);
                     
                     //book logs (hindi pa considered as book logs kase hindi pa filtered ung booking na tapos na)
-                    SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");  
+                    /*SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");  
                     String date2 = format2.format(date);
-                    String pid = "select id from passenger order by id desc limit 1";
+                    String pid = "select id from travel_history order by id desc limit 1";
                     System.out.println("Ref Date: "+date2);
                     ResultSet rs4 = stmt.executeQuery(pid);
                     while (rs4.next()){
@@ -307,7 +309,7 @@ public class dasb extends javax.swing.JFrame {
                     String history="insert into travel_history (driver_id,driver_name,passenger_id,passenger_name,time_in,ref_date) "
                         + "values("+(fetch)+",(select name from driver where id = "+(fetch)+"),'"+(pid)+"','"+(name)+"','"+(time)+"','"+(date2)+"')";
                     System.out.println("Executing: "+history);
-                    stmt.executeUpdate(history);
+                    stmt.executeUpdate(history); **/
                     JOptionPane.showMessageDialog(null, "Saved!","SAVE",JOptionPane.INFORMATION_MESSAGE);
                     this.dispose();
                     new dasb().setVisible(true);
