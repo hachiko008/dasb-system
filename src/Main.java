@@ -22,17 +22,21 @@ public class Main extends javax.swing.JFrame {
         //ResultSet rs = stmt.executeQuery(user);
         
             //refresh book logs
-            String load="select * from travel_history";
+            String load="select driver_name,passenger_name,A.time_in,A.ref_date from travel_history A "
+                    + "inner join driver B on A.driver_id = B.id "
+                    + "inner join driver_status C on B.driver_status_id = C.id "
+                    + "where C.id in (2,3) order by A.time_in";
             ResultSet rs = stmt.executeQuery(load);
              while (rs.next())
         {  
             String drv_name = rs.getString("driver_name");
             String psngr_name = rs.getString("passenger_name");
-            String time_in = rs.getString("time_in");
-            String ref_date = rs.getString("ref_date");
+            String time_in = rs.getString("A.time_in");
+            String ref_date = rs.getString("A.ref_date");
+            String status = rs.getString("C.description");
 
             model.addRow(new Object []{
-            drv_name,psngr_name,time_in,ref_date});
+            drv_name,psngr_name,time_in,ref_date,status});
         }
 
         /*while(rs.next()){
@@ -53,7 +57,6 @@ public class Main extends javax.swing.JFrame {
         table = new javax.swing.JTable();
         button1 = new java.awt.Button();
         button2 = new java.awt.Button();
-        button3 = new java.awt.Button();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         lblTime = new javax.swing.JLabel();
@@ -81,11 +84,11 @@ public class Main extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Driver's Name", "Passenger", "Time in", "Ref Date"
+                "Driver's Name", "Passenger", "Time in", "Ref Date", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -118,16 +121,6 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        button3.setActionCommand("Button2");
-        button3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        button3.setLabel("Rotation");
-        button3.setName(""); // NOI18N
-        button3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button3ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,12 +145,10 @@ public class Main extends javax.swing.JFrame {
                                     .addComponent(lblTime, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(22, 22, 22))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(199, 199, 199)
+                        .addGap(253, 253, 253)
                         .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(31, 31, 31)
-                        .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(24, 24, 24)
-                        .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -179,12 +170,11 @@ public class Main extends javax.swing.JFrame {
                         .addComponent(lblDate, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
+                .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(button2, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
-                    .addComponent(button1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(button3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE))
-                .addGap(41, 41, 41))
+                    .addComponent(button1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(48, 48, 48))
         );
 
         pack();
@@ -205,10 +195,6 @@ public class Main extends javax.swing.JFrame {
         dasb.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.dispose();
     }//GEN-LAST:event_button1ActionPerformed
-
-    private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_button3ActionPerformed
 
     public static void main(String args[]) {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -263,7 +249,6 @@ public class Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Button button1;
     private java.awt.Button button2;
-    private java.awt.Button button3;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
